@@ -1,0 +1,15 @@
+{
+  "name": "fullstackopen-part4",
+  "version": "1.0.0",
+  "description": "submissions for part 4 of the fullstackopen UoH course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://fullstackopen.com/en/part4"
+  },
+  "author": "maroctamorg",
+  "license": "ISC"
+}
