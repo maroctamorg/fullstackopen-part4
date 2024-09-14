@@ -1,0 +1,10 @@
+PUT http://localhost:3003/api/blogs/66e5687881731d821040d1ae
+Content-Type: application/json
+
+{
+  "title": "On the Geometric Algebra",
+  "author": "David Hestenes",
+  "url": "https://geocalc.clas.asu.edu/html/GAinSR.html",
+  "likes": 5,
+  "id": "66e5687881731d821040d1ae"
+}

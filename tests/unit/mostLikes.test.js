@@ -1,11 +1,11 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
-const { mostBlogs } = require('../utils/list_helper')
+const { mostLikes } = require('../../utils/list_helper')
 
-describe('author with most blogs', () => {
+describe('author with most likes', () => {
     const listWithNoBlogs = []
     test('of empty list is undefined', () => {
-        const result = mostBlogs(listWithNoBlogs)
+        const result = mostLikes(listWithNoBlogs)
         assert.strictEqual(result, undefined)
     })
 
@@ -21,10 +21,10 @@ describe('author with most blogs', () => {
     ]
 
     test('when list has only one blog, it is that blog\'s author', () => {
-        const result = mostBlogs(listWithOneBlog)
+        const result = mostLikes(listWithOneBlog)
         assert.deepStrictEqual(result, {
             author: 'Edsger W. Dijkstra',
-            blogs: 1
+            likes: 5
         })
     })
 
@@ -79,12 +79,12 @@ describe('author with most blogs', () => {
         }
     ]
 
-    test('of a bigger list is correctly identified', () => {
-        const result = mostBlogs(blogs)
+    test('of a bigger list is correctly calculated', () => {
+        const result = mostLikes(blogs)
         assert.deepStrictEqual(result,
             {
-                author: 'Robert C. Martin',
-                blogs: 3
+                author: 'Edsger W. Dijkstra',
+                likes: 17
             }
         )
     })
