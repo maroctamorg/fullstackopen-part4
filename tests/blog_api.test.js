@@ -1,4 +1,4 @@
-const { test, beforeEach, after } = require('node:test')
+const { test, describe, beforeEach, after } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
@@ -13,58 +13,82 @@ beforeEach(async () => {
     await Promise.all(initialblogs.map(blog => new Blog(blog).save()))
 })
 
-test('correct number of blog entries is returned', async () => {
-    const result = await api.get('/api/blogs')
-    assert.strictEqual(result.body.length, initialblogs.length)
+describe('when fetching resources', () => {
+    test('correct number of blog entries is returned', async () => {
+        const result = await api.get('/api/blogs')
+        assert.strictEqual(result.body.length, initialblogs.length)
+    })
+
+    test('unique identifier property of the blog posts is named id', async () => {
+        const result = await api.get('/api/blogs')
+        assert(result.body[0].id)
+    })
 })
 
-test('unique identifier property of the blog posts is named id', async () => {
-    const result = await api.get('/api/blogs')
-    assert(result.body[0].id)
+describe('when adding resources', () => {
+    test('a valid blog can be added', async () => {
+        const newBlog = {
+            title: 'Bitcoin',
+            author: 'Satoshi Nakamoto',
+            url: 'https://bitcoin.org/en/',
+            likes: 1000000
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const addedBlogId = response.body.id
+        const blogs = await Blog.find({})
+        assert.strictEqual(blogs.length, initialblogs.length + 1)
+        assert.deepStrictEqual(blogs.find(blog => blog.id === addedBlogId).toJSON(), { id: addedBlogId, ...newBlog })
+    })
+
+    test('likes property defaults to 0', async () => {
+        const newBlog = { title: 'Bitcoin', author: 'Satoshi Nakamoto', url: 'https://bitcoin.org/en/' }
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+
+        assert.strictEqual(response.body.likes, 0)
+    })
+
+    test('title and url properties are required', async () => {
+        const newBlog = { author: 'Satoshi Nakamoto' }
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+
+        console.log(response.body.error)
+        assert.strictEqual(response.body.error, 'Blog validation failed: url: URL required, title: Title required')
+    })
 })
 
-test('a valid blog can be added', async () => {
-    const newBlog = {
-        title: 'Bitcoin',
-        author: 'Satoshi Nakamoto',
-        url: 'https://bitcoin.org/en/',
-        likes: 1000000
-    }
+describe('when updating resources', () => {
+    test('a blog can be deleted', async () => {
+        const blogs = await Blog.find({})
+        await api.delete(`/api/blogs/${blogs[0].id}`).expect(204)
 
-    const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+        const remainingBlogs = await Blog.find({})
+        assert.strictEqual(remainingBlogs.length, initialblogs.length - 1)
+    })
 
-    const destructureModel = ({ title, author, url, likes }) => ({ title, author, url, likes })
+    test('a blog can be updated', async () => {
+        const blogs = await Blog.find({})
+        const blogToUpdate = blogs[0].toJSON()
+        const updatedBlog = { ...blogToUpdate, url: 'https://new.url.com', likes: blogToUpdate.likes + 1 }
 
-    const addedBlogId = response.body.id
-    const blogs = await Blog.find({})
-    assert.strictEqual(blogs.length, initialblogs.length + 1)
-    assert.deepStrictEqual(destructureModel(blogs.find(blog => blog.id === addedBlogId)), newBlog)
+        const response = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedBlog)
+            .expect(200)
+
+        assert.deepStrictEqual(response.body, updatedBlog)
+    })
 })
-
-test('likes property defaults to 0', async () => {
-    const newBlog = { title: 'Bitcoin', author: 'Satoshi Nakamoto', url: 'https://bitcoin.org/en/' }
-    const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-
-    assert.strictEqual(response.body.likes, 0)
-})
-
-test('title and url properties are required', async () => {
-    const newBlog = { author: 'Satoshi Nakamoto' }
-    const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-
-    console.log(response.body.error)
-    assert.strictEqual(response.body.error, 'Blog validation failed: url: URL required, title: Title required')
-})
-
 
 after(async () => {
     await mongoose.connection.close()
