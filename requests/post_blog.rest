@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "McLovin strikes again",
+    "author": "McLovin",
+    "url": "http://www.mclovin.com",
+    "likes": 69
+}
