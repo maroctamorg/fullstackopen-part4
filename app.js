@@ -1,10 +1,12 @@
 require('express-async-errors')
 
-const config = require('./utils/config')
+const config = require('./config/env')
+const { returnInternalError } = require('./config/errors')
 const logger = require('./utils/logger')
 
 const express = require('express')
 const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
 
 const cors = require('cors')
 const mongoose = require('mongoose')
@@ -20,6 +22,8 @@ mongoose.connect(config.MONGODB_CONNECTION_STRING)
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+app.use('/api/users', usersRouter)
 app.use('/api/blogs', blogsRouter)
 
 const unknownEndpoint = (req, res) => {
@@ -36,6 +40,10 @@ const errorHandler = (error, req, res, next) => {
 
     if (error.name === 'ValidationError') {
         return res.status(400).json({ error: error.message })
+    }
+
+    if (error.name === 'MongoServerError' && returnInternalError) {
+        return res.status(500).json(error)
     }
 
     next(error)

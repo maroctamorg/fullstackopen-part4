@@ -1,4 +1,4 @@
-const config = require('./utils/config')
+const config = require('./config/env')
 const logger = require('./utils/logger')
 const app = require('./app')
 
