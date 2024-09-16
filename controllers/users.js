@@ -5,7 +5,7 @@ const { saltRounds } = require('../config/crypto')
 const { validate } = require('./validation/users_validation')
 
 usersRouter.get('/', async (request, response) =>
-    response.json(await User.find({})))
+    response.json(await User.find({}).populate('blogs', { url: 1, title: 1, author: 1 })))
 
 usersRouter.post('/', async (request, response) => {
     await validate(request.body)

@@ -1,5 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1jbG92aW4iLCJpZCI6IjY2ZTg1MTBiZWVhOWY1ZDBjNTZmOWYyNyIsImlhdCI6MTcyNjUwMTE1MH0.y37iCWtWCscJ9iwQ-lFC1Dqr5i9O2b_rnh-pSg0fnX4
 
 {
     "title": "McLovin strikes again",
