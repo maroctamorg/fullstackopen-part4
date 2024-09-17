@@ -29,9 +29,10 @@ blogsRouter.put('/:id', async (req, res) => {
             title: req.body.title,
             author: req.body.author,
             url: req.body.url,
-            likes: req.body.likes
+            likes: req.body.likes,
+            user: req.body.user.id
         },
-        { new: true, runValidators: true, context: 'query' }))
+        { new: true, runValidators: true, context: 'query' }).populate('user', { username: 1, name: 1 }))
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
